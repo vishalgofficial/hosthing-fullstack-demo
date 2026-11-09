@@ -96,11 +96,14 @@ RUN npm run test
 # It pulls the package.json and package-lock.json from the test stage to ensure that
 # the tests run (without this, the test stage would simply be skipped).
 ###################################################
-FROM base AS final
+# Runtime uses the same Debian release as the native SQLite build, without
+# compilers and other build-only packages. Keep build/test stages unchanged.
+FROM node:22-bookworm-slim AS final
+WORKDIR /usr/local/app
 ENV NODE_ENV=production
 COPY --from=test /usr/local/app/package.json /usr/local/app/package-lock.json ./
 COPY .npmrc .
-RUN npm ci --production && \
+RUN npm ci --omit=dev && \
     npm cache clean --force
 COPY --from=sqlite3-build /usr/local/app/node_modules/sqlite3/build \
     ./node_modules/sqlite3/build
