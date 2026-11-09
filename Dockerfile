@@ -110,4 +110,6 @@ COPY --from=sqlite3-build /usr/local/app/node_modules/sqlite3/build \
 COPY backend/src ./src
 COPY --from=client-build /usr/local/app/dist ./src/static
 EXPOSE 3000
+# Run the application and its scoped maintenance shell without root privileges.
+USER 1000:1000
 CMD ["node", "src/index.js"]
